@@ -1,0 +1,7 @@
+1. export OPENAI_API_KEY=""
+2. pip3 install streamlit
+3. pip3 install openai 
+4. pip3 install stqdm
+5. pip3 install streamlit_chat
+6. pip3 install nltk
+7. pip install tqdm

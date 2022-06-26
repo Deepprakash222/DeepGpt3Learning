@@ -4,9 +4,6 @@ from streamlit_chat import message as st_message
 from openai_api import *
 from stqdm import stqdm
 
-#api=st.text_input("Enter your OpenAI API",type="password")
-#os.environ['OPENAI_API_KEY'] = api
-
 
 if os.getenv("OPENAI_API_KEY")!="":
     pass
