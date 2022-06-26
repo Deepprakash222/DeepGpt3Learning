@@ -1,38 +1,79 @@
 from typing import Literal
+from sqlalchemy import false
 import streamlit as st
 from streamlit_chat import message as st_message
+from openai_api import *
+from stqdm import stqdm
+
+approved=[]
+paragraph=[]
+st.markdown(
+    """
+    <style>
+    [data-testid="stSidebar"][aria-expanded="true"] > div:first-child {
+        width: 800px;
+    }
+    [data-testid="stSidebar"][aria-expanded="false"] > div:first-child {
+        width: 500px;
+        margin-left: -50px;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 
 if "history" not in st.session_state:
     st.session_state.history = []
-    intro="King is an intelligent assistant author of horror, supernatural fiction, suspense, crime, science-fiction, and fantasy novels inspired by Stephen King. It has great ideas for articles, blogs, and movie creation. It is helping to provide article titles, sub-headers for the article's title, and also great, flourishing, expensive vocabularies within paragraphs. If the user said no to something, King will offer to help the user. If the user liked an idea, King politely ask for confirmation."
+    intro="Hello there, you are with King! I am an Artificial Intelligent Assistant for helping you create beautiful, inspired, horror, supernatural fiction, suspense, crime, science-fiction, fantasy articles, and novels. Please tell me if you have an idea for a title for what you want to write about.\n"
     st.session_state.history.append({"message": intro, "is_user": False})
 if 'liked' not in st.session_state:
     st.session_state['liked'] = []
+if 'para' not in st.session_state:
+    st.session_state['para'] = []
 
-st.sidebar.title("Kings")
-def first_api(input):
-    return "ABC" + input
-def second_api(input):
-    return "CDE" +input
+st.title("King:- Your Friend in need")
+
+
+
+def store_content(user_insertion: Text):
+  if re.search(r'(title approved)', user_insertion, re.IGNORECASE):
+    st.session_state.liked.append(st.session_state.history[-1])
+    return chatbot(user_insertion)
+  elif re.search(r'(sub-headers approved)', user_insertion, re.IGNORECASE):
+    st.session_state.liked.append(st.session_state.history[-1])
+    return chatbot(user_insertion)
+  elif re.search(r'(expand sub-headers)', user_insertion, re.IGNORECASE):
+    for i in stqdm(range(len(st.session_state.liked))):
+        paragraph.append(st.session_state.liked[i]["message"])
+    st.session_state.para.append({"sub-headers":paragraph[-1],"param":paragraph_generator(paragraph)})
+    return "Sorry if it took much time. I hope you would like the content of each sub-header."
+  elif re.search(r'(content approved)', user_insertion, re.IGNORECASE):
+    return "I'm happy that I was able to help you. Please give us feedback about your satisfaction – this would mean a lot to me as an author."
+  else:
+    return chatbot(user_insertion)
 
 def generate_answer():
+
     user_message = st.session_state.input_text
-    if "Thanks. Can you check" in user_message:
-        result= second_api(user_message)
-        last_recommendation= st.session_state.history[-1]["message"]
-        st.session_state.liked.append({"message": last_recommendation, "is_user": True})
-        st.session_state.liked.append({"message": user_message, "is_user": True})
-        st.session_state.liked.append({"message": result, "is_user": False})
-    else:
-        result = first_api(user_message)
+    result = store_content(user_message)
+    for i in stqdm(range(len(st.session_state.liked))):
+        approved.append(st.session_state.liked[i]["message"])
+   
+    st.sidebar.text_area(label="Approved Suggestion List:", value="\n".join(approved), height=20)
+    if len(st.session_state.para)!=0:
+        st.sidebar.text_area(label=st.session_state.para[-1]["sub-headers"], value=st.session_state.para[-1]["param"], height=350)
 
     st.session_state.history.append({"message": user_message, "is_user": True})
     st.session_state.history.append({"message": result, "is_user": False})
 
 
-
-
-for chat in (st.session_state.history):
-    st_message(**chat)  # unpacking
-
 st.text_input("Talk to the bot", key="input_text", on_change=generate_answer,max_chars=100000)
+
+
+
+k=1
+for chat in (reversed(st.session_state.history)):
+    st_message(**chat,key=str(k)) 
+    k=k+1
+
+
