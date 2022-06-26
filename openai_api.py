@@ -42,14 +42,12 @@ def paragraph_generator(list_of_sub_headers: List):
   list_of_paragraphs = []
   list_of_sub_headers = list(filter(None, list_of_sub_headers[-1].strip(' ').split('\n')))
 
-  prompt = ["Expand these sub-headers into a detailed professional, witty and clever explanation paragraph.\n"]
+  prompt = ["Expand these sub-headers into a detailed professional, witty and clever explanation paragraph."]
 
-  for index, sub_header in enumerate(tqdm(list_of_sub_headers, desc="Generating paragraphs")):
-    if index != 0:
-      prompt.append(f"\n{sub_header}\n")
-    else:
-      prompt.append(f"\n\n{sub_header}\n")
-
+  for sub_header in tqdm(list_of_sub_headers, desc="Generating paragraphs"):
+    # print(sub_header)
+    prompt.append(f'\n\n"{sub_header}"\n')
+    
     response = openai.Completion.create(
       model="text-davinci-002",
       prompt="".join(prompt),
@@ -69,7 +67,6 @@ def paragraph_generator(list_of_sub_headers: List):
   return "\n\n".join("".join([header, paragraph])
                  for header, paragraph in  list(zip(list_of_sub_headers,
                                                     list_of_paragraphs)))
-
 def sentence_tokenization(text: Text) -> List[Text]:
   text = re.sub(r"(^\n)(\n)(\w)", r"\2\3", text)
   tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
