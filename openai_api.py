@@ -14,15 +14,11 @@ from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from tqdm import tqdm
 
-#api = getpass('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')
-#os.environ['OPENAI_API_KEY'] = api
 
 history_chat = ["King is an intelligent assistant author of horror, supernatural fiction, suspense, crime, science-fiction, and fantasy novels inspired by Stephen King. It has great ideas for articles, blogs, and movie creation. It is helping to provide article titles, sub-headers for the article's title, and also great, flourishing, expensive vocabulary within paragraphs. If the user said no to something, King will offer to help the user.\n\nKing: Hello there, you have with you, King! an Artificial Intelligent Assistant for helping you create beautiful, inspired, horror, supernatural fiction, suspense, crime, science-fiction, fantasy articles, and novels. Please tell me if you have an idea for a title for what you want to write about.\n"]
 ARTICLE = []
 
 
-#openai.api_key = os.getenv("OPENAI_API_KEY")
-openai.api_key ='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'
 
 def chatbot(user_insertion: Text):
   global history_chat
@@ -46,13 +42,13 @@ def paragraph_generator(list_of_sub_headers: List):
   list_of_paragraphs = []
   list_of_sub_headers = list(filter(None, list_of_sub_headers[-1].strip(' ').split('\n')))
 
-  prompt = ["Expand this sub-headers in to a detailed professional , witty and clever explanation paragraph."]
+  prompt = ["Expand these sub-headers into a detailed professional, witty and clever explanation paragraph.\n"]
 
   for index, sub_header in enumerate(tqdm(list_of_sub_headers, desc="Generating paragraphs")):
     if index != 0:
-      prompt.append(f"\n\n{sub_header}\n")
+      prompt.append(f"\n{sub_header}\n")
     else:
-      prompt.append(f"\n{sub_header}\n\n")
+      prompt.append(f"\n\n{sub_header}\n")
 
     response = openai.Completion.create(
       model="text-davinci-002",
@@ -73,7 +69,6 @@ def paragraph_generator(list_of_sub_headers: List):
   return "\n\n".join("".join([header, paragraph])
                  for header, paragraph in  list(zip(list_of_sub_headers,
                                                     list_of_paragraphs)))
-
 
 def sentence_tokenization(text: Text) -> List[Text]:
   text = re.sub(r"(^\n)(\n)(\w)", r"\2\3", text)
