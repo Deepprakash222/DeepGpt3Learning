@@ -6,7 +6,6 @@ from typing import List, Text, Dict, Tuple
 import openai
 from getpass import getpass
 from pprint import pprint
-
 import nltk
 nltk.download('punkt')
 nltk.download("stopwords")
@@ -40,8 +39,7 @@ def chatbot(user_insertion: Text):
 
 def paragraph_generator(list_of_sub_headers: List):
   list_of_paragraphs = []
-  list_of_sub_headers = list(filter(None, list_of_sub_headers[-1].strip(' ').split('\n')))
-
+  list_of_sub_headers = list(filter(None, list_of_sub_headers.strip(' ').split('\n')))
   prompt = ["Expand these sub-headers into a detailed professional, witty and clever explanation paragraph."]
 
   for sub_header in tqdm(list_of_sub_headers, desc="Generating paragraphs"):
